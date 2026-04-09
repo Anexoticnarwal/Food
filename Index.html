@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herb & Spice Explorer</title>
+<style>
+body { margin:0; font-family: system-ui; background: #f4f7fb; }
+h1 { text-align: center; padding: 20px; color: #2563eb; }
+#wheelContainer { display:flex; justify-content:center; align-items:center; flex-direction:column; }
+svg { max-width: 95vw; max-height: 70vh; }
+#infoBox { margin-top:20px; text-align:center; color:#0f172a; }
+.combo { font-weight:bold; color:#1e40af; }
+button { margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#2563eb; color:white; font-weight:800; }
+</style>
+</head>
+<body>
+
+<h1>Herb & Spice Explorer</h1>
+<div id="wheelContainer">
+  <svg id="herbWheel"></svg>
+  <svg id="comboWheel"></svg>
+  <div id="infoBox">Tap on a herb or combo to see details here</div>
+  <button onclick="shuffleWheels()">Shuffle Wheels</button>
+</div>
+
+<script>
+const herbs = [
+  {name:'Basil', country:'Italy'},
+  {name:'Thyme', country:'France'},
+  {name:'Cilantro', country:'Mexico'},
+  {name:'Oregano', country:'Greece'},
+  {name:'Sage', country:'USA'},
+  {name:'Mint', country:'Morocco'},
+  {name:'Rosemary', country:'Spain'},
+  {name:'Dill', country:'Russia'},
+  {name:'Parsley', country:'Egypt'},
+  {name:'Tarragon', country:'France'}
+];
+
+const combos = [
+  {name:'Italian Blend', herbs:['Basil','Oregano','Parsley']},
+  {name:'Mexican Kick', herbs:['Cilantro','Thyme','Oregano']},
+  {name:'Mediterranean', herbs:['Rosemary','Thyme','Basil']},
+  {name:'Herbal Comfort', herbs:['Sage','Dill','Mint']},
+  {name:'French Classic', herbs:['Tarragon','Thyme','Parsley']}
+];
+
+const herbWheel = document.getElementById('herbWheel');
+const comboWheel = document.getElementById('comboWheel');
+const infoBox = document.getElementById('infoBox');
+
+function drawWheel(svg, items, radius=150) {
+  svg.innerHTML='';
+  const cx = radius+10;
+  const cy = radius+10;
+  svg.setAttribute('viewBox',`0 0 ${radius*2+20} ${radius*2+20}`);
+
+  const angleStep = 2*Math.PI/items.length;
+  items.forEach((item,i)=>{
+    const angle = i*angleStep - Math.PI/2;
+    const x = cx + radius * Math.cos(angle);
+    const y = cy + radius * Math.sin(angle);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',x);
+    circle.setAttribute('cy',y);
+    circle.setAttribute('r',15);
+    circle.setAttribute('fill','#2563eb');
+    circle.style.cursor='pointer';
+    circle.onclick = ()=>showInfo(item);
+    svg.appendChild(circle);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',x);
+    text.setAttribute('y',y+4);
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('fill','white');
+    text.style.fontSize='10px';
+    text.style.fontWeight='bold';
+    text.textContent=item.name;
+    svg.appendChild(text);
+  });
+}
+
+function showInfo(item){
+  if(item.herbs){
+    infoBox.innerHTML=`<span class='combo'>${item.name}</span>: ${item.herbs.join(', ')}`;
+  } else {
+    infoBox.innerHTML=`<span class='combo'>${item.name}</span>: Origin - ${item.country}`;
+  }
+}
+
+function shuffleWheels(){
+  herbs.sort(()=>Math.random()-0.5);
+  combos.sort(()=>Math.random()-0.5);
+  drawWheel(herbWheel,herbs);
+  drawWheel(comboWheel,combos);
+}
+
+drawWheel(herbWheel,herbs);
+drawWheel(comboWheel,combos);
+</script>
+
+</body>
+</html>
